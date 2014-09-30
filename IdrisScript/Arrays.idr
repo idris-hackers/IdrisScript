@@ -46,9 +46,7 @@ pop (MkJSArray arr) = do
 infixl 6 !!
 (!!) : JSValue JSArray -> Nat -> IO (Maybe (t : JSType ** JSValue t))
 (MkJSArray arr) !! idx = do
-  elm <- mkForeign (FFun "%0[%1]" [FPtr, FInt] FPtr) arr (
-      cast {from=Nat} {to=Int} idx
-    )
+  elm <- mkForeign (FFun "%0[%1]" [FPtr, FInt] FPtr) arr (cast idx)
   case !(typeOf elm) of
        JSUndefined => return Nothing
        JSNull      => return Nothing
