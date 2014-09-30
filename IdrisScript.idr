@@ -71,21 +71,39 @@ isUndefined ptr = do
   ty <- typeOf ptr
   return $ ty == JSUndefined
 
-class Convert from (to : JSType) where
-  convert : from -> JSValue to
+class ToJS from (to : JSType) where
+  toJS : from -> JSValue to
 
-instance Convert String JSString where
-  convert str = MkJSString (believe_me str)
+instance ToJS String JSString where
+  toJS str = MkJSString (believe_me str)
 
-instance Convert Int JSNumber where
-  convert num = MkJSNumber (believe_me num)
+instance ToJS Int JSNumber where
+  toJS num = MkJSNumber (believe_me num)
 
-instance Convert Float JSNumber where
-  convert num = MkJSNumber (believe_me num)
+instance ToJS Float JSNumber where
+  toJS num = MkJSNumber (believe_me num)
 
-instance Convert Bool JSBoolean where
-  convert False = MkJSBoolean (believe_me 0)
-  convert True  = MkJSBoolean (believe_me 1)
+instance ToJS Bool JSBoolean where
+  toJS False = MkJSBoolean (believe_me 0)
+  toJS True  = MkJSBoolean (believe_me 1)
+
+class FromJS (from : JSType) to where
+  fromJS : JSValue from -> to
+
+instance FromJS JSString String where
+  fromJS (MkJSString str) = believe_me str
+
+instance FromJS JSNumber Int where
+  fromJS (MkJSNumber num) = cast {from=Float} {to=Int} (believe_me num)
+
+instance FromJS JSNumber Float where
+  fromJS (MkJSNumber num) = believe_me num
+
+instance FromJS JSBoolean Bool where
+  fromJS (MkJSBoolean b) = check (believe_me b)
+    where
+      check : Int -> Bool
+      check b = b >= 1
 
 total
 unpack : JSValue t -> Ptr
