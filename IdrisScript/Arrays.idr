@@ -4,8 +4,8 @@ import IdrisScript
 
 %access public
 
-new : IO (JSValue JSArray)
-new = do
+empty : IO (JSValue JSArray)
+empty = do
   arr <- mkForeign (FFun "new Array()" [] FPtr)
   return $ MkJSArray arr
 
