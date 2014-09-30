@@ -9,8 +9,9 @@ empty = do
   arr <- mkForeign (FFun "new Array()" [] FPtr)
   return $ MkJSArray arr
 
-concat : JSValue JSArray -> JSValue JSArray -> IO (JSValue JSArray)
-concat (MkJSArray arr) (MkJSArray arr') = do
+infixr 7 ++
+(++) : JSValue JSArray -> JSValue JSArray -> IO (JSValue JSArray)
+(MkJSArray arr) ++ (MkJSArray arr') = do
   res <- mkForeign (FFun "%0.concat(%1)" [FPtr, FPtr] FPtr) arr arr'
   return $ MkJSArray res
 
