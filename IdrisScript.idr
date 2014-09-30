@@ -128,5 +128,5 @@ pack ptr =
        JSObject   => return (JSObject    ** MkJSObject    ptr)
        _          => return (JSUndefined ** MkJSUndefined ptr)
 
-log : Ptr -> IO ()
-log ptr = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) ptr
+log : JSValue t -> IO ()
+log js = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) (unpack js)
