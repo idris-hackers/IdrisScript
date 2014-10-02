@@ -14,6 +14,17 @@ setProperty prop val obj = do
     ) (unpack obj) prop (unpack val)
   return obj
 
+getProperty : String -> JSValue JSObject -> IO (Maybe (t ** JSValue t))
+getProperty prop obj = do
+  elm <- mkForeign (FFun "%0[%1]" [FPtr, FString] FPtr) (unpack obj) prop
+  case !(typeOf elm) of
+       JSUndefined => return Nothing
+       _           => return $ Just !(pack elm)
+
+infixl 6 !!
+(!!) : JSValue JSObject -> String -> IO (Maybe (t : JSType ** JSValue t))
+obj !! prop = getProperty prop obj
+
 hasOwnProperty : String -> JSValue JSObject -> IO Bool
 hasOwnProperty prop obj = do
   res <- mkForeign (

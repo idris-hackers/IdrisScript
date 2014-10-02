@@ -8,6 +8,7 @@ data JSType = JSNumber
             | JSFunction
             | JSNull
             | JSArray
+            | JSRegExp
             | JSObject
             | JSUndefined
 
@@ -18,6 +19,7 @@ instance Eq JSType where
   JSFunction    == JSFunction  = True
   JSNull        == JSNull      = True
   JSArray       == JSArray     = True
+  JSRegExp      == JSRegExp    = True
   JSObject      == JSObject    = True
   JSUndefined   == JSUndefined = True
   _             == _           = False
@@ -29,6 +31,7 @@ data JSValue : JSType -> Type where
   MkJSFunction  : Ptr -> JSValue JSFunction
   MkJSNull      : Ptr -> JSValue JSNull
   MkJSArray     : Ptr -> JSValue JSArray
+  MkJSRegExp    : Ptr -> JSValue JSRegExp
   MkJSObject    : Ptr -> JSValue JSObject
   MkJSUndefined : Ptr -> JSValue JSUndefined
 
@@ -42,7 +45,8 @@ typeOf ptr = do
        3 => return JSFunction
        4 => return JSNull
        5 => return JSArray
-       6 => return JSObject
+       6 => return JSRegExp
+       7 => return JSObject
        _ => return JSUndefined
 where
   checkType : String
@@ -60,16 +64,13 @@ where
            return 4;
          else if (typeof arg == 'object' && arg.constructor == Array)
            return 5;
-         else if (typeof arg == 'object')
+         else if (arg instanceof RegExp)
            return 6;
-         else
+         else if (typeof arg == 'object')
            return 7;
+         else
+           return 8;
        })(%0)"""
-
-isUndefined : Ptr -> IO Bool
-isUndefined ptr = do
-  ty <- typeOf ptr
-  return $ ty == JSUndefined
 
 class ToJS from (to : JSType) where
   toJS : from -> JSValue to
@@ -113,6 +114,7 @@ unpack (MkJSBoolean ptr)   = ptr
 unpack (MkJSFunction ptr)  = ptr
 unpack (MkJSNull ptr)      = ptr
 unpack (MkJSArray  ptr)    = ptr
+unpack (MkJSRegExp ptr)    = ptr
 unpack (MkJSObject ptr)    = ptr
 unpack (MkJSUndefined ptr) = ptr
 
@@ -125,8 +127,19 @@ pack ptr =
        JSFunction => return (JSFunction  ** MkJSFunction  ptr)
        JSNull     => return (JSNull      ** MkJSNull      ptr)
        JSArray    => return (JSArray     ** MkJSArray     ptr)
+       JSRegExp   => return (JSRegExp    ** MkJSRegExp    ptr)
        JSObject   => return (JSObject    ** MkJSObject    ptr)
        _          => return (JSUndefined ** MkJSUndefined ptr)
 
 log : JSValue t -> IO ()
 log js = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) (unpack js)
+
+isUndefined : JSValue t -> IO Bool
+isUndefined val = do
+  ty <- typeOf (unpack val)
+  return $ ty == JSUndefined
+
+isNull : JSValue t -> IO Bool
+isNull val = do
+  ty <- typeOf (unpack val)
+  return $ ty == JSNull

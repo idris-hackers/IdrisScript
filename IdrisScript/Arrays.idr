@@ -60,5 +60,18 @@ infixl 6 !!
   elm <- mkForeign (FFun "%0[%1]" [FPtr, FInt] FPtr) arr (cast idx)
   case !(typeOf elm) of
        JSUndefined => return Nothing
-       JSNull      => return Nothing
        _           => return $ Just !(pack elm)
+
+shift : JSValue JSArray -> IO (Maybe (t ** JSValue t))
+shift arr = do
+  elm <- mkForeign (FFun "%0.shift()" [FPtr] FPtr) (unpack arr)
+  case !(typeOf elm) of
+       JSUndefined => return Nothing
+       _           => return $ Just !(pack elm)
+
+unshift : JSValue JSArray -> JSValue a -> IO Nat
+unshift arr val = do
+  res <- mkForeign (
+      FFun "%0.unshift(%1)" [FPtr, FPtr] FInt
+    ) (unpack arr) (unpack val)
+  return $ cast {to=Nat} res
