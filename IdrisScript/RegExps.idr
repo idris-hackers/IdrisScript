@@ -12,12 +12,15 @@ instance Eq RegExpFlags where
   Multiline  == Multiline  = True
   _          == _          = False
 
+JSRegExp : JSType
+JSRegExp = JSObject "RegExp"
+
 new : String -> List RegExpFlags -> IO (JSValue JSRegExp)
 new patt flags = do
   regex <- mkForeign (
       FFun "new RegExp(%0, %1)" [FString, FString] FPtr
     ) patt (mkFlags . nub $ flags)
-  return $ MkJSRegExp regex
+  return $ MkJSObject regex
 where
   mkFlags : List RegExpFlags -> String
   mkFlags (Global     :: fs) = "g" ++ mkFlags fs

@@ -8,21 +8,19 @@ data JSType = JSNumber
             | JSFunction
             | JSNull
             | JSArray
-            | JSRegExp
-            | JSObject
+            | JSObject String
             | JSUndefined
 
 instance Eq JSType where
-  JSNumber      == JSNumber    = True
-  JSString      == JSString    = True
-  JSBoolean     == JSBoolean   = True
-  JSFunction    == JSFunction  = True
-  JSNull        == JSNull      = True
-  JSArray       == JSArray     = True
-  JSRegExp      == JSRegExp    = True
-  JSObject      == JSObject    = True
-  JSUndefined   == JSUndefined = True
-  _             == _           = False
+  JSNumber      == JSNumber      = True
+  JSString      == JSString      = True
+  JSBoolean     == JSBoolean     = True
+  JSFunction    == JSFunction    = True
+  JSNull        == JSNull        = True
+  JSArray       == JSArray       = True
+  (JSObject c)  == (JSObject c') = c == c'
+  JSUndefined   == JSUndefined   = True
+  _             == _             = False
 
 data JSValue : JSType -> Type where
   MkJSNumber    : Ptr -> JSValue JSNumber
@@ -31,8 +29,7 @@ data JSValue : JSType -> Type where
   MkJSFunction  : Ptr -> JSValue JSFunction
   MkJSNull      : Ptr -> JSValue JSNull
   MkJSArray     : Ptr -> JSValue JSArray
-  MkJSRegExp    : Ptr -> JSValue JSRegExp
-  MkJSObject    : Ptr -> JSValue JSObject
+  MkJSObject    : Ptr -> JSValue (JSObject con)
   MkJSUndefined : Ptr -> JSValue JSUndefined
 
 typeOf : Ptr -> IO JSType
@@ -45,10 +42,13 @@ typeOf ptr = do
        3 => return JSFunction
        4 => return JSNull
        5 => return JSArray
-       6 => return JSRegExp
-       7 => return JSObject
+       6 => return (JSObject !constructor)
        _ => return JSUndefined
 where
+  constructor : IO String
+  constructor =
+    mkForeign (FFun "%0.constructor.name" [FPtr] FString) ptr
+
   checkType : String
   checkType =
     """(function(arg) {
@@ -64,12 +64,10 @@ where
            return 4;
          else if (typeof arg == 'object' && arg.constructor == Array)
            return 5;
-         else if (arg instanceof RegExp)
-           return 6;
          else if (typeof arg == 'object')
-           return 7;
+           return 6;
          else
-           return 8;
+           return 7;
        })(%0)"""
 
 class ToJS from (to : JSType) where
@@ -114,7 +112,6 @@ unpack (MkJSBoolean ptr)   = ptr
 unpack (MkJSFunction ptr)  = ptr
 unpack (MkJSNull ptr)      = ptr
 unpack (MkJSArray  ptr)    = ptr
-unpack (MkJSRegExp ptr)    = ptr
 unpack (MkJSObject ptr)    = ptr
 unpack (MkJSUndefined ptr) = ptr
 
@@ -127,8 +124,7 @@ pack ptr =
        JSFunction => return (JSFunction  ** MkJSFunction  ptr)
        JSNull     => return (JSNull      ** MkJSNull      ptr)
        JSArray    => return (JSArray     ** MkJSArray     ptr)
-       JSRegExp   => return (JSRegExp    ** MkJSRegExp    ptr)
-       JSObject   => return (JSObject    ** MkJSObject    ptr)
+       JSObject c => return (JSObject c  ** MkJSObject    ptr)
        _          => return (JSUndefined ** MkJSUndefined ptr)
 
 log : JSValue t -> IO ()
