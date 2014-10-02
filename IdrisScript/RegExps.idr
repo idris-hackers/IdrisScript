@@ -2,6 +2,8 @@ module IdrisScript.RegExps
 
 import IdrisScript
 
+%access public
+
 data RegExpFlags = Global
                  | IgnoreCase
                  | Multiline
