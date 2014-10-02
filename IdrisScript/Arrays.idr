@@ -15,12 +15,23 @@ infixr 7 ++
   res <- mkForeign (FFun "%0.concat(%1)" [FPtr, FPtr] FPtr) arr arr'
   return $ MkJSArray res
 
-insert : JSValue JSArray -> Nat -> JSValue t -> IO (JSValue JSArray)
-insert arr idx val = do
+insert : Nat -> JSValue t -> JSValue JSArray -> IO (JSValue JSArray)
+insert idx val arr = do
   mkForeign (
       FFun "%0[%1] = %2" [FPtr, FInt, FPtr] FUnit
     ) (unpack arr) (cast idx) (unpack val)
   return arr
+
+indexOf : JSValue a -> JSValue JSArray -> IO Int
+indexOf val arr =
+  mkForeign (
+      FFun "%0.indexOf(%1)" [FPtr, FPtr] FInt
+    ) (unpack arr) (unpack val)
+
+join : JSValue JSArray -> IO (JSValue JSArray)
+join arr = do
+  res <- mkForeign (FFun "%0.join()" [FPtr] FPtr) (unpack arr)
+  return $ MkJSArray res
 
 reverse : JSValue JSArray -> IO (JSValue JSArray)
 reverse (MkJSArray arr) = do
