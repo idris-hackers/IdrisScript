@@ -7,6 +7,10 @@ import IdrisScript.Date.Types
 
 %access public
 
+Date : IO (JSValue JSFunction)
+Date = do
+  date <- mkForeign (FFun "Date" [] FPtr)
+  return $ MkJSFunction date
 
 JSDate : JSType
 JSDate = JSObject "Date"

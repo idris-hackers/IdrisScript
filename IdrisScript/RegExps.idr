@@ -4,6 +4,11 @@ import IdrisScript
 
 %access public
 
+RegExp : IO (JSValue JSFunction)
+RegExp = do
+  regex <- mkForeign (FFun "RegExp" [] FPtr)
+  return $ MkJSFunction regex
+
 data RegExpFlags = Global
                  | IgnoreCase
                  | Multiline

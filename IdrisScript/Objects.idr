@@ -2,6 +2,11 @@ module IdrisScript.Objects
 
 import IdrisScript
 
+Object : IO (JSValue JSFunction)
+Object = do
+  obj <- mkForeign (FFun "Object" [] FPtr)
+  return $ MkJSFunction obj
+
 empty : IO (JSValue (JSObject "Object"))
 empty = do
   obj <- mkForeign (FFun "new Object()" [] FPtr)

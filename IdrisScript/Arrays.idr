@@ -4,6 +4,11 @@ import IdrisScript
 
 %access public
 
+Array : IO (JSValue JSFunction)
+Array = do
+  arr <- mkForeign (FFun "Array" [] FPtr)
+  return $ MkJSFunction arr
+
 empty : IO (JSValue JSArray)
 empty = do
   arr <- mkForeign (FFun "new Array()" [] FPtr)
