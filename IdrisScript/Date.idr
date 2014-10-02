@@ -130,10 +130,8 @@ where
   toMonth 11 = November
   toMonth _  = December
 
-getYear : JSValue JSDate -> IO Year
-getYear date = do
-  year <- mkForeign (FFun "%0.getYear()" [FPtr] FInt) (unpack date)
-  return $ MkYear year
+getYear : JSValue JSDate -> IO Int
+getYear date = mkForeign (FFun "%0.getYear()" [FPtr] FInt) (unpack date)
 
 getDate : JSValue JSDate -> IO Date
 getDate date = do
@@ -154,3 +152,8 @@ getSeconds : JSValue JSDate -> IO Seconds
 getSeconds date = do
   seconds <- mkForeign (FFun "%0.getSeconds()" [FPtr] FInt) (unpack date)
   return $ MkSeconds seconds
+
+getFullYear : JSValue JSDate -> IO Year
+getFullYear date = do
+  year <- mkForeign (FFun "%0.getFullYear()" [FPtr] FInt) (unpack date)
+  return $ MkYear year
