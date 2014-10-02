@@ -1,0 +1,15 @@
+package idrisscript
+
+modules = IdrisScript
+        , IdrisScript.Arrays
+        , IdrisScript.Arrays.Unpacked
+        , IdrisScript.Date
+        , IdrisScript.Date.Days
+        , IdrisScript.Date.Months
+        , IdrisScript.Date.Types
+        , IdrisScript.Functions
+        , IdrisScript.Functions.Unpacked
+        , IdrisScript.Objects
+        , IdrisScript.Objects.Unpacked
+        , IdrisScript.RegExps
+        , IdrisScript.Strings
