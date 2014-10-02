@@ -81,3 +81,32 @@ unshift arr val = do
       FFun "%0.unshift(%1)" [FPtr, FPtr] FInt
     ) (unpack arr) (unpack val)
   return $ cast {to=Nat} res
+
+head : JSValue JSArray -> IO (Maybe (t ** JSValue t))
+head arr = do
+  elm <- mkForeign (FFun "%0[0]" [FPtr] FPtr) (unpack arr)
+  case !(typeOf elm) of
+       JSUndefined => return Nothing
+       _           => return $ Just !(pack elm)
+
+tail : JSValue JSArray -> IO (JSValue JSArray)
+tail arr = do
+  elm <- mkForeign (FFun
+      """(function(arr) {
+           return arr.slice(1, arr.length);
+         })(%0)""" [FPtr] FPtr
+    ) (unpack arr)
+
+  return (MkJSObject elm)
+
+slice : JSValue JSArray -> Int -> Int -> IO (JSValue JSArray)
+slice arr from to = do
+  res <- mkForeign (
+      FFun "%0.slice(%1,%2)" [FPtr, FInt, FInt] FPtr
+    ) (unpack arr) from to
+  return $ MkJSObject res
+
+singleton : JSValue t -> IO (JSValue JSArray)
+singleton val = do
+  arr <- mkForeign (FFun "[%0]" [FPtr] FPtr) (unpack val)
+  return $ MkJSObject arr
