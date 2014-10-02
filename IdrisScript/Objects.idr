@@ -39,3 +39,8 @@ hasOwnProperty prop obj = do
       FFun "%0.hasOwnProperty(%1)" [FPtr, FString] FInt
     ) (unpack obj) prop
   return $ res == 1
+
+keys : JSValue (JSObject c) -> IO (JSValue JSArray)
+keys obj = do
+  keys <- mkForeign (FFun "Object.keys(%0)" [FPtr] FPtr) (unpack obj)
+  return $ MkJSObject keys
