@@ -65,14 +65,29 @@ instance Cast Day.Day Nat where
   cast Saturday  = 6
   cast Sunday    = 7
 
-data Year         = MkYear Int
-data Month        = MkMonth Month.Month
-data Date         = MkDate Int
-data Day          = MkDay Day.Day
-data Hours        = MkHours Int
-data Minutes      = MkMinutes Int
-data Seconds      = MkSeconds Int
-data Milliseconds = MkMilliseconds Int
+record Year : Type where
+  MkYear : (unYear : Int) -> Year
+
+record Month : Type where
+  MkMonth : (unMonth : Month.Month) -> Date.Month
+
+record Date : Type where
+  MkDate : (unDate : Int) -> Date
+
+record Day : Type where
+  MkDay : (unDay : Day.Day) -> Date.Day
+
+record Hours : Type where
+  MkHours : (unHours : Int) -> Hours
+
+record Minutes : Type where
+  MkMinutes : (unMinutes : Int) -> Minutes
+
+record Seconds : Type where
+  MkSeconds : (unSecondes : Int) -> Seconds
+
+record Milliseconds : Type where
+  MkMilliseconds : (unMilliseconds : Int) -> Milliseconds
 
 JSDate : JSType
 JSDate = JSObject "Date"
