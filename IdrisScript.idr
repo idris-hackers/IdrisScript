@@ -7,7 +7,6 @@ data JSType = JSNumber
             | JSBoolean
             | JSFunction
             | JSNull
-            | JSArray
             | JSObject String
             | JSUndefined
 
@@ -17,7 +16,6 @@ instance Eq JSType where
   JSBoolean     == JSBoolean     = True
   JSFunction    == JSFunction    = True
   JSNull        == JSNull        = True
-  JSArray       == JSArray       = True
   (JSObject c)  == (JSObject c') = c == c'
   JSUndefined   == JSUndefined   = True
   _             == _             = False
@@ -28,9 +26,11 @@ data JSValue : JSType -> Type where
   MkJSBoolean   : Ptr -> JSValue JSBoolean
   MkJSFunction  : Ptr -> JSValue JSFunction
   MkJSNull      : Ptr -> JSValue JSNull
-  MkJSArray     : Ptr -> JSValue JSArray
   MkJSObject    : Ptr -> JSValue (JSObject con)
   MkJSUndefined : Ptr -> JSValue JSUndefined
+
+JSArray : JSType
+JSArray = JSObject "Array"
 
 typeOf : Ptr -> IO JSType
 typeOf ptr = do
@@ -40,10 +40,9 @@ typeOf ptr = do
        1 => return JSString
        2 => return JSBoolean
        3 => return JSFunction
-       4 => return JSNull
-       5 => return JSArray
-       6 => return (JSObject !constructor)
-       _ => return JSUndefined
+       4 => return JSUndefined
+       5 => return (JSObject !constructor)
+       _ => return JSNull
 where
   constructor : IO String
   constructor =
@@ -60,14 +59,12 @@ where
            return 2;
          else if (typeof arg == 'function')
            return 3;
-         else if (arg === null)
+         else if (typeof arg == 'undefined')
            return 4;
-         else if (typeof arg == 'object' && arg.constructor == Array)
-           return 5;
          else if (typeof arg == 'object')
-           return 6;
+           return 5;
          else
-           return 7;
+           return 6;
        })(%0)"""
 
 class ToJS from (to : JSType) where
@@ -111,7 +108,6 @@ unpack (MkJSString ptr)    = ptr
 unpack (MkJSBoolean ptr)   = ptr
 unpack (MkJSFunction ptr)  = ptr
 unpack (MkJSNull ptr)      = ptr
-unpack (MkJSArray  ptr)    = ptr
 unpack (MkJSObject ptr)    = ptr
 unpack (MkJSUndefined ptr) = ptr
 
@@ -123,7 +119,6 @@ pack ptr =
        JSBoolean  => return (JSBoolean   ** MkJSBoolean   ptr)
        JSFunction => return (JSFunction  ** MkJSFunction  ptr)
        JSNull     => return (JSNull      ** MkJSNull      ptr)
-       JSArray    => return (JSArray     ** MkJSArray     ptr)
        JSObject c => return (JSObject c  ** MkJSObject    ptr)
        _          => return (JSUndefined ** MkJSUndefined ptr)
 

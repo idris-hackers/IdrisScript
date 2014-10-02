@@ -7,13 +7,15 @@ import IdrisScript
 empty : IO (JSValue JSArray)
 empty = do
   arr <- mkForeign (FFun "new Array()" [] FPtr)
-  return $ MkJSArray arr
+  return $ MkJSObject arr
 
 infixr 7 ++
 (++) : JSValue JSArray -> JSValue JSArray -> IO (JSValue JSArray)
-(MkJSArray arr) ++ (MkJSArray arr') = do
-  res <- mkForeign (FFun "%0.concat(%1)" [FPtr, FPtr] FPtr) arr arr'
-  return $ MkJSArray res
+arr ++ arr' = do
+  res <- mkForeign (
+      FFun "%0.concat(%1)" [FPtr, FPtr] FPtr
+    ) (unpack arr) (unpack arr')
+  return $ MkJSObject res
 
 insert : Nat -> JSValue t -> JSValue JSArray -> IO (JSValue JSArray)
 insert idx val arr = do
@@ -31,33 +33,37 @@ indexOf val arr =
 join : JSValue JSArray -> IO (JSValue JSArray)
 join arr = do
   res <- mkForeign (FFun "%0.join()" [FPtr] FPtr) (unpack arr)
-  return $ MkJSArray res
+  return $ MkJSObject res
 
 reverse : JSValue JSArray -> IO (JSValue JSArray)
-reverse (MkJSArray arr) = do
-  res <- mkForeign (FFun "%0.reverse()" [FPtr] FPtr) arr
-  return $ MkJSArray res
+reverse arr = do
+  res <- mkForeign (FFun "%0.reverse()" [FPtr] FPtr) (unpack arr)
+  return $ MkJSObject res
 
 sort : JSValue JSArray -> IO (JSValue JSArray)
-sort (MkJSArray arr) = do
-  res <- mkForeign (FFun "%0.sort()" [FPtr] FPtr) arr
-  return $ MkJSArray res
+sort arr = do
+  res <- mkForeign (FFun "%0.sort()" [FPtr] FPtr) (unpack arr)
+  return $ MkJSObject res
 
 push : JSValue JSArray -> JSValue t -> IO ()
-push (MkJSArray arr) val =
-  mkForeign (FFun "%0.push(%1)" [FPtr, FPtr] FUnit) arr (unpack val)
+push arr val =
+  mkForeign (
+      FFun "%0.push(%1)" [FPtr, FPtr] FUnit
+    ) (unpack arr) (unpack val)
 
 pop : JSValue JSArray -> IO (Maybe (t : JSType ** JSValue t))
-pop (MkJSArray arr) = do
-  elm <- mkForeign (FFun "%0.pop()" [FPtr] FPtr) arr
+pop arr = do
+  elm <- mkForeign (FFun "%0.pop()" [FPtr] FPtr) (unpack arr)
   case !(typeOf elm) of
        JSUndefined => return Nothing
        _           => return $ Just !(pack elm)
 
 infixl 6 !!
 (!!) : JSValue JSArray -> Nat -> IO (Maybe (t : JSType ** JSValue t))
-(MkJSArray arr) !! idx = do
-  elm <- mkForeign (FFun "%0[%1]" [FPtr, FInt] FPtr) arr (cast idx)
+arr !! idx = do
+  elm <- mkForeign (
+      FFun "%0[%1]" [FPtr, FInt] FPtr
+    ) (unpack arr) (cast idx)
   case !(typeOf elm) of
        JSUndefined => return Nothing
        _           => return $ Just !(pack elm)

@@ -33,7 +33,7 @@ match str regex = do
   res <- mkForeign (
       FFun "%0.match(%1)" [FString, FPtr] FPtr
     ) str (unpack regex)
-  return $ MkJSArray res
+  return $ MkJSObject res
 
 replace : String -> JSValue JSRegExp -> String -> IO String
 replace str regex rpl =
@@ -46,5 +46,5 @@ split str regex = do
   res <- mkForeign (
       FFun "%0.split(%1)" [FString, FPtr] FPtr
     ) str (unpack regex)
-  return $ MkJSArray res
+  return $ MkJSObject res
 
