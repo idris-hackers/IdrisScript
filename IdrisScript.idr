@@ -41,11 +41,11 @@ typeOf ptr = do
        2 => return JSBoolean
        3 => return JSFunction
        4 => return JSUndefined
-       5 => return (JSObject !constructor)
+       5 => return (JSObject !ctrName)
        _ => return JSNull
 where
-  constructor : IO String
-  constructor =
+  ctrName : IO String
+  ctrName =
     mkForeign (FFun "%0.constructor.name" [FPtr] FString) ptr
 
   checkType : String
