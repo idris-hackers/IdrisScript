@@ -22,14 +22,14 @@ now = do
   return $ MkJSObject res
 
 ||| Creates a new `Date` object from milliseconds.
-newFromMilliseconds : Milliseconds -> IO (JSValue JSDate)
-newFromMilliseconds (MkMilliseconds millis) = do
+newDateFromMilliseconds : Milliseconds -> IO (JSValue JSDate)
+newDateFromMilliseconds (MkMilliseconds millis) = do
   res <- mkForeign (FFun "new Date(%0)" [FInt] FPtr) millis
   return $ MkJSObject res
 
 ||| Creates a new `Date` object from a string.
-newFromString : String -> IO (JSValue JSDate)
-newFromString str = do
+newDateFromString : String -> IO (JSValue JSDate)
+newDateFromString str = do
   res <- mkForeign (FFun "new Date(%0)" [FString] FPtr) str
   return $ MkJSObject res
 
