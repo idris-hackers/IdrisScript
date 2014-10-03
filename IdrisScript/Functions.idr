@@ -43,3 +43,6 @@ hasOwnProperty prop fun = do
       FFun "%0.hasOwnProperty(%1)" [FPtr, FString] FInt
     ) (unpack fun) prop
   return $ res == 1
+
+name : JSValue JSFunction -> IO String
+name fun = mkForeign (FFun "%0.name" [FPtr] FString) (unpack fun)
