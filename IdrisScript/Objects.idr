@@ -49,3 +49,13 @@ constructor : JSValue (JSObject c) -> IO (JSValue JSFunction)
 constructor obj = do
   con <- mkForeign (FFun "%0.constructor" [FPtr] FPtr) (unpack obj)
   return $ MkJSFunction con
+
+toJSObject : (Traversable f, ToJS from to)
+          => f (String, from)
+          -> IO (JSValue (JSObject "Object"))
+toJSObject {from} {to} xs = do
+  obj <- empty
+  traverse_ (\x =>
+      setProperty (fst x) (toJS {from} {to} (snd x)) obj
+    ) xs
+  return obj
