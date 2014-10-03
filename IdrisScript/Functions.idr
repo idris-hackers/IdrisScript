@@ -4,21 +4,28 @@ import IdrisScript
 
 %access public
 
+infixl 6 !!
+
 Function : IO (JSValue JSFunction)
 Function = do
   fun <- mkForeign (FFun "Function" [] FPtr)
   return $ MkJSFunction fun
 
-apply : JSValue JSFunction -> JSValue JSArray -> IO (t ** JSValue t)
-apply fun arg = do
+||| Applys an array `args` as arguments to the function `fun`
+apply : (fun : JSValue JSFunction)
+     -> (args : JSValue JSArray)
+     -> IO (t ** JSValue t)
+apply fun args = do
   res <- mkForeign (
       FFun "%0.apply(this, %1)" [FPtr, FPtr] FPtr
-    ) (unpack fun) (unpack arg)
+    ) (unpack fun) (unpack args)
   pack res
 
-setProperty : String
-           -> JSValue a
-           -> JSValue JSFunction
+||| Sets the property `prop` to the value `val` for a function `fun`. Modifies
+||| the original value.
+setProperty : (prop : String)
+           -> (val : JSValue a)
+           -> (fun : JSValue JSFunction)
            -> IO (JSValue JSFunction)
 setProperty prop val fun = do
   mkForeign (
@@ -26,23 +33,32 @@ setProperty prop val fun = do
     ) (unpack fun) prop (unpack val)
   return fun
 
-getProperty : String -> JSValue JSFunction -> IO (Maybe (t ** JSValue t))
+||| Gets the property `prop` from a function `fun`.
+getProperty : (prop : String)
+           -> (fun : JSValue JSFunction)
+           -> IO (Maybe (t ** JSValue t))
 getProperty prop fun = do
   elm <- mkForeign (FFun "%0[%1]" [FPtr, FString] FPtr) (unpack fun) prop
   case !(typeOf elm) of
        JSUndefined => return Nothing
        _           => return $ Just !(pack elm)
 
-infixl 6 !!
-(!!) : JSValue JSFunction -> String -> IO (Maybe (t : JSType ** JSValue t))
+||| Gets the property `prop` from a function `fun`.
+(!!) : (fun : JSValue JSFunction)
+    -> (prop : String)
+    -> IO (Maybe (t : JSType ** JSValue t))
 fun !! prop = getProperty prop fun
 
-hasOwnProperty : String -> JSValue JSFunction -> IO Bool
+||| Checks if a function `fun` has the property `prop`.
+hasOwnProperty : (prop : String)
+              -> (fun : JSValue JSFunction)
+              -> IO Bool
 hasOwnProperty prop fun = do
   res <- mkForeign (
       FFun "%0.hasOwnProperty(%1)" [FPtr, FString] FInt
     ) (unpack fun) prop
   return $ res == 1
 
+||| Returns the name of a function.
 name : JSValue JSFunction -> IO String
 name fun = mkForeign (FFun "%0.name" [FPtr] FString) (unpack fun)

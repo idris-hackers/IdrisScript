@@ -22,6 +22,7 @@ instance Eq RegExpFlags where
 JSRegExp : JSType
 JSRegExp = JSObject "RegExp"
 
+||| Creates a new RegExp with a list of flags.
 newRegExp : String -> List RegExpFlags -> IO (JSValue JSRegExp)
 newRegExp patt flags = do
   regex <- mkForeign (
@@ -35,23 +36,33 @@ where
   mkFlags (Multiline  :: fs) = "m" ++ mkFlags fs
   mkFlags []                 = ""
 
-match : String -> JSValue JSRegExp -> IO (JSValue JSArray)
+||| Uses a RegExp `regex` on the string `str`.
+match : (str : String)
+     -> (regex : JSValue JSRegExp)
+     -> IO (JSValue JSArray)
 match str regex = do
   res <- mkForeign (
       FFun "%0.match(%1)" [FString, FPtr] FPtr
     ) str (unpack regex)
   return $ MkJSObject res
 
-replace : String -> JSValue JSRegExp -> String -> IO String
+||| Replaces matches of `regex` with `rpl` in the string `str`. Modifies
+||| the original value.
+replace : (str : String)
+       -> (regex : JSValue JSRegExp)
+       -> (rpl : String)
+       -> IO String
 replace str regex rpl =
   mkForeign (
       FFun "%0.replace(%1, %2)" [FString, FPtr, FString] FString
     ) str (unpack regex) rpl
 
-split : String -> JSValue JSRegExp -> IO (JSValue JSArray)
+||| Splits an array `str` at the occurences of `regex`.
+split : (str : String)
+     -> (regex : JSValue JSRegExp)
+     -> IO (JSValue JSArray)
 split str regex = do
   res <- mkForeign (
       FFun "%0.split(%1)" [FString, FPtr] FPtr
     ) str (unpack regex)
   return $ MkJSObject res
-

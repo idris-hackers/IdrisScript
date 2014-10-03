@@ -104,6 +104,7 @@ instance FromJS JSBoolean Bool where
       check : Int -> Bool
       check b = b >= 1
 
+||| Unpacks a JavaScript value
 total
 unpack : JSValue t -> JSRef
 unpack (MkJSNumber JSRef)    = JSRef
@@ -114,6 +115,7 @@ unpack (MkJSNull JSRef)      = JSRef
 unpack (MkJSObject JSRef)    = JSRef
 unpack (MkJSUndefined JSRef) = JSRef
 
+||| Packs up a JavaScript referenc into a JSValue
 pack : JSRef -> IO (t ** JSValue t)
 pack JSRef =
   case !(typeOf JSRef) of
@@ -125,20 +127,28 @@ pack JSRef =
        JSObject c => return (JSObject c  ** MkJSObject    JSRef)
        _          => return (JSUndefined ** MkJSUndefined JSRef)
 
+||| Log a value to console
 log : JSValue t -> IO ()
 log js = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) (unpack js)
 
+||| Check if a value is undefined
 isUndefined : JSValue t -> IO Bool
 isUndefined val = do
   ty <- typeOf (unpack val)
   return $ ty == JSUndefined
 
+||| Check if a value is null
 isNull : JSValue t -> IO Bool
 isNull val = do
   ty <- typeOf (unpack val)
   return $ ty == JSNull
 
-new : JSValue JSFunction -> JSValue JSArray -> IO (c ** JSValue (JSObject c))
+||| Create a new object with a constructor function
+||| @ con constructor function
+||| @ args constructor arguments
+new : (con : JSValue JSFunction)
+   -> (args : JSValue JSArray)
+   -> IO (c ** JSValue (JSObject c))
 new con args = do
   obj <- mkForeign (FFun """(function(con,args) {
                               function Con(con, args) {
