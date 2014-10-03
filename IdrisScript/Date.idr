@@ -33,6 +33,12 @@ newDateFromString str = do
   res <- mkForeign (FFun "new Date(%0)" [FString] FPtr) str
   return $ MkJSObject res
 
+||| Copies a `Date` object.
+copyDate : (JSValue JSDate) -> IO (JSValue JSDate)
+copyDate date = do
+  res <- mkForeign (FFun "new Date(%0)" [FPtr] FPtr) (unpack date)
+  return $ MkJSObject res
+
 ||| Gets the day of `Date` object.
 getDay : JSValue JSDate -> IO Day
 getDay date = do
