@@ -128,3 +128,9 @@ forEach f xs = do
                         Just elm => f elm
                         Nothing  => return ()
             ) [0..len]
+
+toJSArray : (Traversable f, ToJS from to) => f from -> IO (JSValue JSArray)
+toJSArray {from} {to} xs = do
+  arr <- empty
+  traverse_ (\x => arr `push` (toJS {from} {to} x)) xs
+  return arr
