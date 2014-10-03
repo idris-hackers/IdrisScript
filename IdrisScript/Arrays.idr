@@ -121,13 +121,12 @@ length arr = do
   len <- mkForeign (FFun "%0.length" [FPtr] FInt) (unpack arr)
   return $ cast len
 
-forEach : ((t ** JSValue t) -> IO ()) -> JSValue JSArray -> IO ()
-forEach f xs = do
-  len <- length xs
-  traverse_ (\i => case !(xs !! i) of
-                        Just elm => f elm
-                        Nothing  => return ()
-            ) [0..len]
+forEach : (JSRaw -> IO ()) -> JSValue JSArray -> IO ()
+forEach f arr =
+  mkForeign (
+    FFun "(function(arr,f){for(var i=0;i<arr.length;i++)f(arr[i])})(%0,%1)"
+        [FPtr, FFunction FPtr (FAny (IO ()))] FUnit
+    ) (unpack arr) f
 
 toJSArray : (Traversable f, ToJS from to) => f from -> IO (JSValue JSArray)
 toJSArray {from} {to} xs = do
