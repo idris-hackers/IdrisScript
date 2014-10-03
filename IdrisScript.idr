@@ -134,3 +134,19 @@ isNull : JSValue t -> IO Bool
 isNull val = do
   ty <- typeOf (unpack val)
   return $ ty == JSNull
+
+new : JSValue JSFunction -> JSValue JSArray -> IO (c ** JSValue (JSObject c))
+new con args = do
+  obj <- mkForeign (FFun """(function(con,args) {
+                              function Con(con, args) {
+                                return con.apply(this, args);
+                              }
+                              Con.prototype = con.prototype;
+                              return new Con(con, args);
+                            })(%0, %1)""" [FPtr, FPtr] FPtr
+                   ) (unpack con) (unpack args)
+  return $ (!(ctrName obj) ** MkJSObject obj)
+where
+  ctrName : Ptr -> IO String
+  ctrName ptr =
+    mkForeign (FFun "%0.constructor.name" [FPtr] FString) ptr
