@@ -13,3 +13,4 @@ modules = IdrisScript
         , IdrisScript.Objects.Unpacked
         , IdrisScript.RegExps
         , IdrisScript.Strings
+        , IdrisScript.JSON
