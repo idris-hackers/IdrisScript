@@ -7,5 +7,5 @@ main : IO ()
 main = do
   date <- now
   log date
-  setFullYear (MkYear 2015) date
+  date `setFullYear` (MkYear 2015)
   log date

@@ -85,8 +85,8 @@ getYear : JSValue JSDate -> IO Int
 getYear date = mkForeign (FFun "%0.getYear()" [FPtr] FInt) (unpack date)
 
 ||| Sets the year from a `Date` object. Modifies the original date.
-setYear : Year -> JSValue JSDate -> IO (JSValue JSDate)
-setYear year date = do
+setYear : JSValue JSDate -> Year -> IO (JSValue JSDate)
+setYear date year = do
   mkForeign (
       FFun "%0.setYear(%1)" [FPtr, FInt] FUnit
     ) (unpack date) (unYear year)
@@ -99,11 +99,11 @@ getDate date = do
   return $ MkDate date'
 
 ||| Sets the date from a `Date` object. Modifies the original date.
-setDate : Date -> JSValue JSDate -> IO (JSValue JSDate)
-setDate d date = do
+setDate : JSValue JSDate -> Date -> IO (JSValue JSDate)
+setDate date date' = do
   mkForeign (
       FFun "%0.setDate(%1)" [FPtr, FInt] FInt
-    ) (unpack date) (unDate d)
+    ) (unpack date) (unDate date')
   return date
 
 ||| Gets the hours from a `Date` object.
@@ -113,8 +113,8 @@ getHours date = do
   return $ MkHours hours
 
 ||| Sets the hours from a `Date` object. Modifies the original date.
-setHours : Hours -> JSValue JSDate -> IO (JSValue JSDate)
-setHours hours date = do
+setHours : JSValue JSDate -> Hours -> IO (JSValue JSDate)
+setHours date hours = do
   mkForeign (
       FFun "%0.setHours(%1)" [FPtr, FInt] FInt
     ) (unpack date) (unHours hours)
@@ -127,8 +127,8 @@ getMinutes date = do
   return $ MkMinutes minutes
 
 ||| Sets the minutes from a `Date` object. Modifies the original date.
-setMinutes : Minutes -> JSValue JSDate -> IO (JSValue JSDate)
-setMinutes mins date = do
+setMinutes : JSValue JSDate -> Minutes -> IO (JSValue JSDate)
+setMinutes date mins = do
   mkForeign (
       FFun "%0.setMinutes(%1)" [FPtr, FInt] FInt
     ) (unpack date) (unMinutes mins)
@@ -141,8 +141,8 @@ getSeconds date = do
   return $ MkSeconds seconds
 
 ||| Sets the seconds from a `Date` object. Modifies the original date.
-setSeconds : Seconds -> JSValue JSDate -> IO (JSValue JSDate)
-setSeconds secs date = do
+setSeconds : JSValue JSDate -> Seconds -> IO (JSValue JSDate)
+setSeconds date secs = do
   mkForeign (
       FFun "%0.setSeconds(%1)" [FPtr, FInt] FInt
     ) (unpack date) (unSeconds secs)
@@ -155,8 +155,8 @@ getFullYear date = do
   return $ MkYear year
 
 ||| Sets the full year of a `Date` object. Modifies the original date.
-setFullYear : Year -> JSValue JSDate -> IO (JSValue JSDate)
-setFullYear year date = do
+setFullYear : JSValue JSDate -> Year -> IO (JSValue JSDate)
+setFullYear date year = do
   mkForeign (
       FFun "%0.setFullYear(%1)" [FPtr, FInt] FInt
     ) (unpack date) (unYear year)
