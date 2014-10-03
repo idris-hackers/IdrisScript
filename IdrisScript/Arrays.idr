@@ -115,3 +115,16 @@ singleton : JSValue t -> IO (JSValue JSArray)
 singleton val = do
   arr <- mkForeign (FFun "[%0]" [FPtr] FPtr) (unpack val)
   return $ MkJSObject arr
+
+length : JSValue JSArray -> IO Nat
+length arr = do
+  len <- mkForeign (FFun "%0.length" [FPtr] FInt) (unpack arr)
+  return $ cast len
+
+forEach : ((t ** JSValue t) -> IO ()) -> JSValue JSArray -> IO ()
+forEach f xs = do
+  len <- length xs
+  traverse_ (\i => case !(xs !! i) of
+                        Just elm => f elm
+                        Nothing  => return ()
+            ) [0..len]
