@@ -2,8 +2,8 @@ module IdrisScript
 
 %access public
 
-JSRaw : Type
-JSRaw = Ptr
+JSRef : Type
+JSRef = Ptr
 
 data JSType = JSNumber
             | JSString
@@ -24,20 +24,20 @@ instance Eq JSType where
   _             == _             = False
 
 data JSValue : JSType -> Type where
-  MkJSNumber    : JSRaw -> JSValue JSNumber
-  MkJSString    : JSRaw -> JSValue JSString
-  MkJSBoolean   : JSRaw -> JSValue JSBoolean
-  MkJSFunction  : JSRaw -> JSValue JSFunction
-  MkJSNull      : JSRaw -> JSValue JSNull
-  MkJSObject    : JSRaw -> JSValue (JSObject con)
-  MkJSUndefined : JSRaw -> JSValue JSUndefined
+  MkJSNumber    : JSRef -> JSValue JSNumber
+  MkJSString    : JSRef -> JSValue JSString
+  MkJSBoolean   : JSRef -> JSValue JSBoolean
+  MkJSFunction  : JSRef -> JSValue JSFunction
+  MkJSNull      : JSRef -> JSValue JSNull
+  MkJSObject    : JSRef -> JSValue (JSObject con)
+  MkJSUndefined : JSRef -> JSValue JSUndefined
 
 JSArray : JSType
 JSArray = JSObject "Array"
 
-typeOf : JSRaw -> IO JSType
-typeOf JSRaw = do
-  res <- mkForeign (FFun checkType [FPtr] FInt) JSRaw
+typeOf : JSRef -> IO JSType
+typeOf JSRef = do
+  res <- mkForeign (FFun checkType [FPtr] FInt) JSRef
   case res of
        0 => return JSNumber
        1 => return JSString
@@ -49,7 +49,7 @@ typeOf JSRaw = do
 where
   ctrName : IO String
   ctrName =
-    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRaw
+    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRef
 
   checkType : String
   checkType =
@@ -105,25 +105,25 @@ instance FromJS JSBoolean Bool where
       check b = b >= 1
 
 total
-unpack : JSValue t -> JSRaw
-unpack (MkJSNumber JSRaw)    = JSRaw
-unpack (MkJSString JSRaw)    = JSRaw
-unpack (MkJSBoolean JSRaw)   = JSRaw
-unpack (MkJSFunction JSRaw)  = JSRaw
-unpack (MkJSNull JSRaw)      = JSRaw
-unpack (MkJSObject JSRaw)    = JSRaw
-unpack (MkJSUndefined JSRaw) = JSRaw
+unpack : JSValue t -> JSRef
+unpack (MkJSNumber JSRef)    = JSRef
+unpack (MkJSString JSRef)    = JSRef
+unpack (MkJSBoolean JSRef)   = JSRef
+unpack (MkJSFunction JSRef)  = JSRef
+unpack (MkJSNull JSRef)      = JSRef
+unpack (MkJSObject JSRef)    = JSRef
+unpack (MkJSUndefined JSRef) = JSRef
 
-pack : JSRaw -> IO (t ** JSValue t)
-pack JSRaw =
-  case !(typeOf JSRaw) of
-       JSNumber   => return (JSNumber    ** MkJSNumber    JSRaw)
-       JSString   => return (JSString    ** MkJSString    JSRaw)
-       JSBoolean  => return (JSBoolean   ** MkJSBoolean   JSRaw)
-       JSFunction => return (JSFunction  ** MkJSFunction  JSRaw)
-       JSNull     => return (JSNull      ** MkJSNull      JSRaw)
-       JSObject c => return (JSObject c  ** MkJSObject    JSRaw)
-       _          => return (JSUndefined ** MkJSUndefined JSRaw)
+pack : JSRef -> IO (t ** JSValue t)
+pack JSRef =
+  case !(typeOf JSRef) of
+       JSNumber   => return (JSNumber    ** MkJSNumber    JSRef)
+       JSString   => return (JSString    ** MkJSString    JSRef)
+       JSBoolean  => return (JSBoolean   ** MkJSBoolean   JSRef)
+       JSFunction => return (JSFunction  ** MkJSFunction  JSRef)
+       JSNull     => return (JSNull      ** MkJSNull      JSRef)
+       JSObject c => return (JSObject c  ** MkJSObject    JSRef)
+       _          => return (JSUndefined ** MkJSUndefined JSRef)
 
 log : JSValue t -> IO ()
 log js = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) (unpack js)
@@ -150,6 +150,6 @@ new con args = do
                    ) (unpack con) (unpack args)
   return $ (!(ctrName obj) ** MkJSObject obj)
 where
-  ctrName : JSRaw -> IO String
-  ctrName JSRaw =
-    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRaw
+  ctrName : JSRef -> IO String
+  ctrName JSRef =
+    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRef

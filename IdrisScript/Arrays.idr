@@ -121,7 +121,7 @@ length arr = do
   len <- mkForeign (FFun "%0.length" [FPtr] FInt) (unpack arr)
   return $ cast len
 
-forEach : (JSRaw -> IO ()) -> JSValue JSArray -> IO ()
+forEach : (JSRef -> IO ()) -> JSValue JSArray -> IO ()
 forEach f arr =
   mkForeign (
     FFun "(function(arr,f){for(var i=0;i<arr.length;i++)f(arr[i])})(%0,%1)"
