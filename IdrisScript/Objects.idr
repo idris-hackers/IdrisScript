@@ -44,3 +44,8 @@ keys : JSValue (JSObject c) -> IO (JSValue JSArray)
 keys obj = do
   keys <- mkForeign (FFun "Object.keys(%0)" [FPtr] FPtr) (unpack obj)
   return $ MkJSObject keys
+
+constructor : JSValue (JSObject c) -> IO (JSValue JSFunction)
+constructor obj = do
+  con <- mkForeign (FFun "%0.constructor" [FPtr] FPtr) (unpack obj)
+  return $ MkJSFunction con
