@@ -22,8 +22,8 @@ instance Eq RegExpFlags where
 JSRegExp : JSType
 JSRegExp = JSObject "RegExp"
 
-new : String -> List RegExpFlags -> IO (JSValue JSRegExp)
-new patt flags = do
+newRegExp : String -> List RegExpFlags -> IO (JSValue JSRegExp)
+newRegExp patt flags = do
   regex <- mkForeign (
       FFun "new RegExp(%0, %1)" [FString, FString] FPtr
     ) patt (mkFlags . nub $ flags)
