@@ -62,3 +62,9 @@ hasOwnProperty prop fun = do
 ||| Returns the name of a function.
 name : JSValue JSFunction -> IO String
 name fun = mkForeign (FFun "%0.name" [FPtr] FString) (unpack fun)
+
+||| Returns the constructor of a function.
+constructor : JSValue JSFunction -> IO (JSValue JSFunction)
+constructor fun = do
+  con <- mkForeign (FFun "%0.constructor" [FPtr] FPtr) (unpack fun)
+  return $ MkJSFunction con
