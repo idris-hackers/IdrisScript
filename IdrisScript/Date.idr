@@ -67,18 +67,40 @@ getMonth date  = do
   return $ toMonth month
 where
   toMonth : Int -> Month
-  toMonth 1  = January
-  toMonth 2  = February
-  toMonth 3  = March
-  toMonth 4  = April
-  toMonth 5  = May
-  toMonth 6  = June
-  toMonth 7  = July
-  toMonth 8  = August
-  toMonth 9  = September
-  toMonth 10 = October
-  toMonth 11 = November
+  toMonth 0  = January
+  toMonth 1  = February
+  toMonth 2  = March
+  toMonth 3  = April
+  toMonth 4  = May
+  toMonth 5  = June
+  toMonth 6  = July
+  toMonth 7  = August
+  toMonth 8  = September
+  toMonth 9  = October
+  toMonth 10 = November
   toMonth _  = December
+
+||| Sets the month from a `Date` object. Modifies the original date.
+setMonth : JSValue JSDate -> Month -> IO (JSValue JSDate)
+setMonth date month = do
+  mkForeign (
+      FFun "%0.setMonth(%1)" [FPtr, FInt] FInt
+    ) (unpack date) (fromMonth month)
+  return date
+where
+  fromMonth : Month -> Int
+  fromMonth January   = 0
+  fromMonth February  = 1
+  fromMonth March     = 2
+  fromMonth April     = 3
+  fromMonth May       = 4
+  fromMonth June      = 5
+  fromMonth July      = 6
+  fromMonth August    = 7
+  fromMonth September = 8
+  fromMonth October   = 9
+  fromMonth November  = 10
+  fromMonth December  = 11
 
 ||| Gets the year from a `Date` object.
 getYear : JSValue JSDate -> IO Int
