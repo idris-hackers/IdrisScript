@@ -60,6 +60,14 @@ getMilliseconds date = do
   millis <- mkForeign (FFun "%0.getMilliseconds()" [FPtr] FInt) (unpack date)
   return $ MkMilliseconds millis
 
+||| Sets the milliseconds from a `Date` object. Modifies the original date.
+setMilliseconds : JSValue JSDate -> Milliseconds -> IO (JSValue JSDate)
+setMilliseconds date millis = do
+  mkForeign (
+      FFun "%0.getMilliseconds(%1)" [FPtr, FInt] FInt
+    ) (unpack date) (unMilliseconds millis)
+  return date
+
 ||| Gets the month from a `Date` object.
 getMonth : JSValue JSDate -> IO Month
 getMonth date  = do
