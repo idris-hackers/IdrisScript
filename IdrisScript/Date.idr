@@ -110,7 +110,7 @@ getYear date = mkForeign (FFun "%0.getYear()" [FPtr] FInt) (unpack date)
 setYear : JSValue JSDate -> Year -> IO (JSValue JSDate)
 setYear date year = do
   mkForeign (
-      FFun "%0.setYear(%1)" [FPtr, FInt] FUnit
+      FFun "%0.setYear(%1)" [FPtr, FInt] FInt
     ) (unpack date) (unYear year)
   return date
 
