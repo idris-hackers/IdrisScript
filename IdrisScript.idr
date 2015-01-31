@@ -5,6 +5,11 @@ module IdrisScript
 JSRef : Type
 JSRef = Ptr
 
+%inline
+jscall : (fname : String) -> (ty : Type) ->
+          {auto fty : FTy FFI_JS [] ty} -> ty
+jscall fname ty = foreign FFI_JS fname ty 
+
 data JSType = JSNumber
             | JSString
             | JSBoolean
@@ -35,9 +40,9 @@ data JSValue : JSType -> Type where
 JSArray : JSType
 JSArray = JSObject "Array"
 
-typeOf : JSRef -> IO JSType
+typeOf : JSRef -> JS_IO JSType
 typeOf JSRef = do
-  res <- mkForeign (FFun checkType [FPtr] FInt) JSRef
+  res <- jscall checkType (Ptr -> JS_IO Int) JSRef
   case res of
        0 => return JSNumber
        1 => return JSString
@@ -47,9 +52,9 @@ typeOf JSRef = do
        5 => return (JSObject !ctrName)
        _ => return JSNull
 where
-  ctrName : IO String
+  ctrName : JS_IO String
   ctrName =
-    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRef
+    jscall "%0.constructor.name" (Ptr -> JS_IO String) JSRef
 
   checkType : String
   checkType =
@@ -116,7 +121,7 @@ unpack (MkJSObject JSRef)    = JSRef
 unpack (MkJSUndefined JSRef) = JSRef
 
 ||| Packs up a JavaScript referenc into a JSValue
-pack : JSRef -> IO (t ** JSValue t)
+pack : JSRef -> JS_IO (t ** JSValue t)
 pack JSRef =
   case !(typeOf JSRef) of
        JSNumber   => return (JSNumber    ** MkJSNumber    JSRef)
@@ -128,17 +133,17 @@ pack JSRef =
        _          => return (JSUndefined ** MkJSUndefined JSRef)
 
 ||| Log a value to console
-log : JSValue t -> IO ()
-log js = mkForeign (FFun "console.log(%0)" [FPtr] FUnit) (unpack js)
+log : JSValue t -> JS_IO ()
+log js = jscall "console.log(%0)" (Ptr -> JS_IO ()) (unpack js)
 
 ||| Check if a value is undefined
-isUndefined : JSValue t -> IO Bool
+isUndefined : JSValue t -> JS_IO Bool
 isUndefined val = do
   ty <- typeOf (unpack val)
   return $ ty == JSUndefined
 
 ||| Check if a value is null
-isNull : JSValue t -> IO Bool
+isNull : JSValue t -> JS_IO Bool
 isNull val = do
   ty <- typeOf (unpack val)
   return $ ty == JSNull
@@ -148,18 +153,18 @@ isNull val = do
 ||| @ args constructor arguments
 new : (con : JSValue JSFunction)
    -> (args : JSValue JSArray)
-   -> IO (c ** JSValue (JSObject c))
+   -> JS_IO (c ** JSValue (JSObject c))
 new con args = do
-  obj <- mkForeign (FFun """(function(con,args) {
-                              function Con(con, args) {
-                                return con.apply(this, args);
-                              }
-                              Con.prototype = con.prototype;
-                              return new Con(con, args);
-                            })(%0, %1)""" [FPtr, FPtr] FPtr
-                   ) (unpack con) (unpack args)
+  obj <- jscall  """(function(con,args) {
+                          function Con(con, args) {
+                            return con.apply(this, args);
+                          }
+                          Con.prototype = con.prototype;
+                          return new Con(con, args);
+                        })(%0, %1)""" (Ptr -> Ptr -> JS_IO Ptr)
+                   (unpack con) (unpack args)
   return $ (!(ctrName obj) ** MkJSObject obj)
 where
-  ctrName : JSRef -> IO String
+  ctrName : JSRef -> JS_IO String
   ctrName JSRef =
-    mkForeign (FFun "%0.constructor.name" [FPtr] FString) JSRef
+    jscall "%0.constructor.name" (Ptr -> JS_IO String) JSRef

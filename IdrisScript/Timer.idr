@@ -12,28 +12,28 @@ abstract
 record Interval : Type where
   MkInterval : (unInterval : Ptr) -> Interval
 
-||| Executes an IO action after `millis` milliseconds.
-setTimeout : (() -> IO ()) -> (millis : Int) -> IO Timeout
+||| Executes a JS_IO action after `millis` milliseconds.
+setTimeout : (() -> JS_IO ()) -> (millis : Int) -> JS_IO Timeout
 setTimeout f millis = do
-  timeout <- mkForeign (
-      FFun "setTimeout(%0, %1)" [FFunction FUnit (FAny (IO ())), FInt] FPtr
-    ) f millis
+  timeout <- jscall "setTimeout(%0, %1)" 
+                    (JsFn (() -> JS_IO ()) -> Int -> JS_IO Ptr)
+                    (MkJsFn f) millis
   return $ MkTimeout timeout
 
 ||| Clears a timeout.
-clearTimeout : Timeout -> IO ()
+clearTimeout : Timeout -> JS_IO ()
 clearTimeout timeout =
-  mkForeign (FFun "clearTimeout(%0)" [FPtr] FUnit) (unTimeout timeout)
+  jscall "clearTimeout(%0)" (Ptr -> JS_IO ()) (unTimeout timeout)
 
-||| Periodically executes an IO action after `millis` milliseconds.
-setInterval : (() -> IO ()) -> Int -> IO Interval
+||| Periodically executes a JS_IO action after `millis` milliseconds.
+setInterval : (() -> JS_IO ()) -> Int -> JS_IO Interval
 setInterval f millis = do
-  interval <- mkForeign (
-      FFun "setInterval(%0, %1)" [FFunction FUnit (FAny (IO ())), FInt] FPtr
-    ) f millis
+  interval <- jscall "setInterval(%0, %1)" 
+                     (JsFn (() -> JS_IO ()) -> Int -> JS_IO Ptr)
+                     (MkJsFn f) millis
   return $ MkInterval interval
 
 ||| Clears an interval.
-clearInterval : Interval -> IO ()
+clearInterval : Interval -> JS_IO ()
 clearInterval interval =
-  mkForeign (FFun "clearInterval(%0)" [FPtr] FUnit) (unInterval interval)
+  jscall "clearInterval(%0)" (Ptr -> JS_IO ()) (unInterval interval)

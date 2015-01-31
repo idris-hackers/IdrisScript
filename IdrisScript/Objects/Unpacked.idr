@@ -8,9 +8,8 @@ setProperty : ToJS from to
            => String
            -> from
            -> JSValue (JSObject c)
-           -> IO (JSValue (JSObject c))
+           -> JS_IO (JSValue (JSObject c))
 setProperty {from} {to} prop val obj = do
-  mkForeign (
-      FFun "%0[%1] = %2" [FPtr, FString, FPtr] FPtr
-    ) (unpack obj) prop (unpack (toJS {from}{to} val))
+  jscall "%0[%1] = %2" (Ptr -> String -> Ptr -> JS_IO Ptr)
+         (unpack obj) prop (unpack (toJS {from}{to} val))
   return obj

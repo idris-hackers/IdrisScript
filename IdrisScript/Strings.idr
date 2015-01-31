@@ -5,48 +5,46 @@ import IdrisScript
 %access public
 
 ||| Upper case a string.
-toUpperCase : String -> IO String
-toUpperCase str = mkForeign (FFun "%0.toUpperCase()" [FString] FString) str
+toUpperCase : String -> JS_IO String
+toUpperCase str = jscall "%0.toUpperCase()" (String -> JS_IO String) str
 
 ||| Lower case a string.
-toLowerCase : String -> IO String
-toLowerCase str = mkForeign (FFun "%0.toLowerCase()" [FString] FString) str
+toLowerCase : String -> JS_IO String
+toLowerCase str = jscall "%0.toLowerCase()" (String -> JS_IO String) str
 
 ||| Trims a string.
-trim : String -> IO String
-trim str = mkForeign (FFun "%0.trim()" [FString] FString) str
+trim : String -> JS_IO String
+trim str = jscall "%0.trim()" (String -> JS_IO String) str
 
 ||| Trims a string from the left.
-trimLeft : String -> IO String
-trimLeft str = mkForeign (FFun "%0.trimLeft()" [FString] FString) str
+trimLeft : String -> JS_IO String
+trimLeft str = jscall "%0.trimLeft()" (String -> JS_IO String) str
 
 ||| Trims a string from the right.
-trimRight : String -> IO String
-trimRight str = mkForeign (FFun "%0.trimRight()" [FString] FString) str
+trimRight : String -> JS_IO String
+trimRight str = jscall "%0.trimRight()" (String -> JS_IO String) str
 
 ||| Returns the position of the string `search` in the string `str`.
-indexOf : (str : String) -> (search : String) -> IO Int
+indexOf : (str : String) -> (search : String) -> JS_IO Int
 indexOf str search =
-  mkForeign (FFun "%0.indexOf(%1)" [FString, FString] FInt) str search
+  jscall "%0.indexOf(%1)" (String -> String -> JS_IO Int) str search
 
 ||| Returns a substring from postion `start` with the length `length` from
 ||| the string `str`.
 substr : (str : String)
       -> (start : Int)
       -> (length : Int)
-      -> IO String
+      -> JS_IO String
 substr str start length =
-  mkForeign (
-      FFun "%0.substr(%1,%2)" [FString, FInt, FInt] FString
-    ) str start length
+  jscall "%0.substr(%1,%2)" (String -> Int -> Int -> JS_IO String)
+          str start length
 
 ||| Returns a substring from position `from` to postion `to` in the
 ||| string `str`.
 substring : (str : String)
          -> (from : Int)
          -> (to : Int)
-         -> IO String
+         -> JS_IO String
 substring str from to =
-  mkForeign (
-      FFun "%0.substring(%1,%2)" [FString, FInt, FInt] FString
-    ) str from to
+  jscall "%0.substring(%1,%2)" (String -> Int -> Int -> JS_IO String)
+          str from to

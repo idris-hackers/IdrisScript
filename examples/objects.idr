@@ -3,7 +3,7 @@ module Main
 import IdrisScript
 import IdrisScript.Objects
 
-main : IO ()
+main : JS_IO ()
 main = do
   obj <- empty
 

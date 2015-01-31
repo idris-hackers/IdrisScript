@@ -4,7 +4,7 @@ import IdrisScript
 import IdrisScript.RegExps
 import IdrisScript.Arrays
 
-main : IO ()
+main : JS_IO ()
 main = do
   args  <- with Arrays empty
   args `push` (toJS {to=JSString} "Pinkie Pie")

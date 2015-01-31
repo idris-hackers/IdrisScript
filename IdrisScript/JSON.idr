@@ -5,13 +5,13 @@ import IdrisScript
 %access public
 
 ||| Converts an object into a JSON string
-stringfy : JSValue (JSObject c) -> IO String
-stringfy obj = mkForeign (FFun "JSON.stringfy(%0)" [FPtr] FString) (unpack obj)
+stringfy : JSValue (JSObject c) -> JS_IO String
+stringfy obj = jscall "JSON.stringfy(%0)" (Ptr -> JS_IO String) (unpack obj)
 
 ||| Parses a JSON string
-parse : String -> IO (Maybe (c ** JSValue (JSObject c)))
+parse : String -> JS_IO (Maybe (c ** JSValue (JSObject c)))
 parse str = do
-  res <- mkForeign (FFun "JSON.parse(%0)" [FString] FPtr) str
+  res <- jscall "JSON.parse(%0)" (String -> JS_IO Ptr) str
   case !(pack res) of
        (JSObject "Object" ** obj) => return $ Just ("Object" ** obj)
        (JSObject "Array"  ** obj) => return $ Just ("Array" ** obj)

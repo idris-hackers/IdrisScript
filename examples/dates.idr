@@ -3,7 +3,7 @@ module Main
 import IdrisScript
 import IdrisScript.Date
 
-main : IO ()
+main : JS_IO ()
 main = do
   current <- now
   if !(getDay current) == Friday

@@ -4,7 +4,7 @@ import IdrisScript
 import IdrisScript.Objects
 import IdrisScript.JSON
 
-main : IO ()
+main : JS_IO ()
 main = do
   let text = "{\"foo\":true,\"bar\":1337}"
   case !(parse text) of

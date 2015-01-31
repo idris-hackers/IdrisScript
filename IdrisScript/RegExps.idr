@@ -4,9 +4,9 @@ import IdrisScript
 
 %access public
 
-RegExp : IO (JSValue JSFunction)
+RegExp : JS_IO (JSValue JSFunction)
 RegExp = do
-  regex <- mkForeign (FFun "RegExp" [] FPtr)
+  regex <- jscall "RegExp" (JS_IO Ptr)
   return $ MkJSFunction regex
 
 data RegExpFlags = Global
@@ -23,11 +23,10 @@ JSRegExp : JSType
 JSRegExp = JSObject "RegExp"
 
 ||| Creates a new RegExp with a list of flags.
-newRegExp : String -> List RegExpFlags -> IO (JSValue JSRegExp)
+newRegExp : String -> List RegExpFlags -> JS_IO (JSValue JSRegExp)
 newRegExp patt flags = do
-  regex <- mkForeign (
-      FFun "new RegExp(%0, %1)" [FString, FString] FPtr
-    ) patt (mkFlags . nub $ flags)
+  regex <- jscall "new RegExp(%0, %1)" (String -> String -> JS_IO Ptr)
+                  patt (mkFlags . nub $ flags)
   return $ MkJSObject regex
 where
   mkFlags : List RegExpFlags -> String
@@ -39,11 +38,10 @@ where
 ||| Uses a RegExp `regex` on the string `str`.
 match : (str : String)
      -> (regex : JSValue JSRegExp)
-     -> IO (JSValue JSArray)
+     -> JS_IO (JSValue JSArray)
 match str regex = do
-  res <- mkForeign (
-      FFun "%0.match(%1)" [FString, FPtr] FPtr
-    ) str (unpack regex)
+  res <- jscall "%0.match(%1)" (String -> Ptr -> JS_IO Ptr) 
+                str (unpack regex)
   return $ MkJSObject res
 
 ||| Replaces matches of `regex` with `rpl` in the string `str`. Modifies
@@ -51,18 +49,16 @@ match str regex = do
 replace : (str : String)
        -> (regex : JSValue JSRegExp)
        -> (rpl : String)
-       -> IO String
+       -> JS_IO String
 replace str regex rpl =
-  mkForeign (
-      FFun "%0.replace(%1, %2)" [FString, FPtr, FString] FString
-    ) str (unpack regex) rpl
+      jscall "%0.replace(%1, %2)" (String -> Ptr -> String -> JS_IO String)
+             str (unpack regex) rpl
 
 ||| Splits an array `str` at the occurences of `regex`.
 split : (str : String)
      -> (regex : JSValue JSRegExp)
-     -> IO (JSValue JSArray)
+     -> JS_IO (JSValue JSArray)
 split str regex = do
-  res <- mkForeign (
-      FFun "%0.split(%1)" [FString, FPtr] FPtr
-    ) str (unpack regex)
+  res <- jscall "%0.split(%1)" (String -> Ptr -> JS_IO Ptr) 
+                str (unpack regex)
   return $ MkJSObject res
