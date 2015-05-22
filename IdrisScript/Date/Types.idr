@@ -5,38 +5,44 @@ import IdrisScript.Date.Days
 
 %access public
 
-record Year : Type where
-  MkYear : (unYear : Int) -> Year
+record Year where
+  constructor MkYear
+  unYear : Int
 
 instance Eq Year where
   year == year' = unYear year == unYear year'
 
-record Date : Type where
-  MkDate : (unDate : Int) -> Date
+record Date where
+  constructor MkDate
+  unDate : Int
 
 instance Eq Date where
   date == date' = unDate date == unDate date'
 
-record Hours : Type where
-  MkHours : (unHours : Int) -> Hours
+record Hours where
+  constructor MkHours
+  unHours : Int
 
 instance Eq Hours where
   hours == hours' = unHours hours == unHours hours'
 
-record Minutes : Type where
-  MkMinutes : (unMinutes : Int) -> Minutes
+record Minutes where
+  constructor MkMinutes
+  unMinutes : Int
 
 instance Eq Minutes where
   mins == mins' = unMinutes mins == unMinutes mins'
 
-record Seconds : Type where
-  MkSeconds : (unSeconds : Int) -> Seconds
+record Seconds where
+  constructor MkSeconds
+  unSeconds : Int
 
 instance Eq Seconds where
   secs == secs' = unSeconds secs == unSeconds secs'
 
-record Milliseconds : Type where
-  MkMilliseconds : (unMilliseconds : Int) -> Milliseconds
+record Milliseconds where
+  constructor MkMilliseconds
+  unMilliseconds : Int
 
 instance Eq Milliseconds where
   millis == millis' = unMilliseconds millis == unMilliseconds millis'

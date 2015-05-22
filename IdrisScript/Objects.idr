@@ -60,8 +60,8 @@ keys obj = do
   return $ MkJSObject keys
 
 ||| Returns the constructor of an object.
-constructor : JSValue (JSObject c) -> JS_IO (JSValue JSFunction)
-constructor obj = do
+constr : JSValue (JSObject c) -> JS_IO (JSValue JSFunction)
+constr obj = do
   con <- jscall "%0.constructor" (Ptr -> JS_IO Ptr) (unpack obj)
   return $ MkJSFunction con
 

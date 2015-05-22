@@ -61,7 +61,7 @@ name : JSValue JSFunction -> JS_IO String
 name fun = jscall "%0.name" (Ptr -> JS_IO String) (unpack fun)
 
 ||| Returns the constructor of a function.
-constructor : JSValue JSFunction -> JS_IO (JSValue JSFunction)
-constructor fun = do
+constr : JSValue JSFunction -> JS_IO (JSValue JSFunction)
+constr fun = do
   con <- jscall "%0.constructor" (Ptr -> JS_IO Ptr) (unpack fun)
   return $ MkJSFunction con

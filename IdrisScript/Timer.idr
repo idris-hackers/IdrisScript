@@ -5,12 +5,14 @@ import IdrisScript
 %access public
 
 abstract
-record Timeout : Type where
-  MkTimeout : (unTimeout : Ptr) -> Timeout
+record Timeout where
+  constructor MkTimeout
+  unTimeout : Ptr
 
 abstract
-record Interval : Type where
-  MkInterval : (unInterval : Ptr) -> Interval
+record Interval where
+  constructor MkInterval
+  unInterval : Ptr
 
 ||| Executes a JS_IO action after `millis` milliseconds.
 setTimeout : (() -> JS_IO ()) -> (millis : Int) -> JS_IO Timeout
