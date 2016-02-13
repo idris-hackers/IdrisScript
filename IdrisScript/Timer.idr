@@ -4,12 +4,12 @@ import IdrisScript
 
 %access public
 
-abstract
+export
 record Timeout where
   constructor MkTimeout
   unTimeout : Ptr
 
-abstract
+export
 record Interval where
   constructor MkInterval
   unInterval : Ptr
@@ -36,6 +36,7 @@ setInterval f millis = do
   return $ MkInterval interval
 
 ||| Clears an interval.
+export
 clearInterval : Interval -> JS_IO ()
 clearInterval interval =
   jscall "clearInterval(%0)" (Ptr -> JS_IO ()) (unInterval interval)
