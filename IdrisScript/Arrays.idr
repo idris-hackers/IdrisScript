@@ -2,7 +2,7 @@ module IdrisScript.Arrays
 
 import IdrisScript
 
-%access public
+%access public export
 
 infixr 7 ++
 

@@ -1,6 +1,6 @@
 module IdrisScript.Date.Months
 
-%access public
+%access public export
 
 data Month = January
            | February
@@ -15,7 +15,7 @@ data Month = January
            | November
            | December
 
-instance Eq Month where
+implementation Eq Month where
   January   == January   = True
   February  == February  = True
   March     == March     = True

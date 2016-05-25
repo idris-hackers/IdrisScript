@@ -2,7 +2,7 @@ module IdrisScript.JSON
 
 import IdrisScript
 
-%access public
+%access public export
 
 ||| Converts an object into a JSON string
 stringfy : JSValue (JSObject c) -> JS_IO String

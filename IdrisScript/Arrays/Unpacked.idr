@@ -2,7 +2,7 @@ module IdrisScript.Arrays.Unpacked
 
 import IdrisScript
 
-%access public
+%access public export
 
 singleton : ToJS from to => from -> JS_IO (JSValue JSArray)
 singleton {from} {to} val = do

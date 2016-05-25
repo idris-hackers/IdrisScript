@@ -5,7 +5,7 @@ import public IdrisScript.Date.Months
 import public IdrisScript.Date.Days
 import public IdrisScript.Date.Types
 
-%access public
+%access public export
 
 Date : JS_IO (JSValue JSFunction)
 Date = do

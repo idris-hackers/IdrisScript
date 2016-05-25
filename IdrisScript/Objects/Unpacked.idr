@@ -2,7 +2,7 @@ module IdrisScript.Objects.Unpacked
 
 import IdrisScript
 
-%access public
+%access public export
 
 setProperty : ToJS from to
            => String
