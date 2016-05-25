@@ -1,6 +1,6 @@
 module IdrisScript
 
-%access public
+%access public export
 
 JSRef : Type
 JSRef = Ptr
@@ -18,7 +18,7 @@ data JSType = JSNumber
             | JSObject String
             | JSUndefined
 
-instance Eq JSType where
+implementation Eq JSType where
   JSNumber      == JSNumber      = True
   JSString      == JSString      = True
   JSBoolean     == JSBoolean     = True
@@ -75,35 +75,35 @@ where
            return 6;
        })(%0)"""
 
-class ToJS from (to : JSType) where
+interface ToJS from (to : JSType) where
   toJS : from -> JSValue to
 
-instance ToJS String JSString where
+implementation ToJS String JSString where
   toJS str = MkJSString (believe_me str)
 
-instance ToJS Int JSNumber where
+implementation ToJS Int JSNumber where
   toJS num = MkJSNumber (believe_me num)
 
-instance ToJS Float JSNumber where
+implementation ToJS Double JSNumber where
   toJS num = MkJSNumber (believe_me num)
 
-instance ToJS Bool JSBoolean where
+implementation ToJS Bool JSBoolean where
   toJS False = MkJSBoolean (believe_me 0)
   toJS True  = MkJSBoolean (believe_me 1)
 
-class FromJS (from : JSType) to where
+interface FromJS (from : JSType) to where
   fromJS : JSValue from -> to
 
-instance FromJS JSString String where
+implementation FromJS JSString String where
   fromJS (MkJSString str) = believe_me str
 
-instance FromJS JSNumber Int where
-  fromJS (MkJSNumber num) = cast {from=Float} {to=Int} (believe_me num)
+implementation FromJS JSNumber Int where
+  fromJS (MkJSNumber num) = cast {from=Double} {to=Int} (believe_me num)
 
-instance FromJS JSNumber Float where
+implementation FromJS JSNumber Double where
   fromJS (MkJSNumber num) = believe_me num
 
-instance FromJS JSBoolean Bool where
+implementation FromJS JSBoolean Bool where
   fromJS (MkJSBoolean b) = check (believe_me b)
     where
       check : Int -> Bool

@@ -2,7 +2,7 @@ module IdrisScript.Strings
 
 import IdrisScript
 
-%access public
+%access public export
 
 ||| Upper case a string.
 toUpperCase : String -> JS_IO String

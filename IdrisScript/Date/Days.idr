@@ -2,7 +2,7 @@ module IdrisScript.Date.Days
 
 import IdrisScript
 
-%access public
+%access public export
 
 data Day = Monday
          | Tuesday
@@ -12,7 +12,7 @@ data Day = Monday
          | Saturday
          | Sunday
 
-instance Eq Day where
+implementation Eq Day where
   Monday    == Monday    = True
   Tuesday   == Tuesday   = True
   Wednesday == Wednesday = True
@@ -22,7 +22,7 @@ instance Eq Day where
   Sunday    == Sunday    = True
   _         == _         = False
 
-instance Cast Day Int where
+implementation Cast Day Int where
   cast Monday    = 1
   cast Tuesday   = 2
   cast Wednesday = 3
@@ -31,7 +31,7 @@ instance Cast Day Int where
   cast Saturday  = 6
   cast Sunday    = 7
 
-instance Cast Day Integer where
+implementation Cast Day Integer where
   cast Monday    = 1
   cast Tuesday   = 2
   cast Wednesday = 3
@@ -40,7 +40,7 @@ instance Cast Day Integer where
   cast Saturday  = 6
   cast Sunday    = 7
 
-instance Cast Day Nat where
+implementation Cast Day Nat where
   cast Monday    = 1
   cast Tuesday   = 2
   cast Wednesday = 3

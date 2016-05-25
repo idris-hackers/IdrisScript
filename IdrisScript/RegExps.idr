@@ -2,7 +2,7 @@ module IdrisScript.RegExps
 
 import IdrisScript
 
-%access public
+%access public export
 
 RegExp : JS_IO (JSValue JSFunction)
 RegExp = do
@@ -13,7 +13,7 @@ data RegExpFlags = Global
                  | IgnoreCase
                  | Multiline
 
-instance Eq RegExpFlags where
+implementation Eq RegExpFlags where
   Global     == Global     = True
   IgnoreCase == IgnoreCase = True
   Multiline  == Multiline  = True

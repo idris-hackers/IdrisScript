@@ -2,7 +2,7 @@ module IdrisScript.Timer
 
 import IdrisScript
 
-%access public
+%access public export
 
 export
 record Timeout where
@@ -23,6 +23,7 @@ setTimeout f millis = do
   return $ MkTimeout timeout
 
 ||| Clears a timeout.
+export
 clearTimeout : Timeout -> JS_IO ()
 clearTimeout timeout =
   jscall "clearTimeout(%0)" (Ptr -> JS_IO ()) (unTimeout timeout)

@@ -2,7 +2,7 @@ module IdrisScript.Functions
 
 import IdrisScript
 
-%access public
+%access public export
 
 infixl 6 !!
 
