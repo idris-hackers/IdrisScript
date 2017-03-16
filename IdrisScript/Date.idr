@@ -10,7 +10,7 @@ import public IdrisScript.Date.Types
 Date : JS_IO (JSValue JSFunction)
 Date = do
   date <- jscall  "Date" (JS_IO Ptr)
-  return $ MkJSFunction date
+  pure $ MkJSFunction date
 
 JSDate : JSType
 JSDate = JSObject "Date"
@@ -19,31 +19,31 @@ JSDate = JSObject "Date"
 now : JS_IO (JSValue JSDate)
 now = do
   res <- jscall "new Date()" (JS_IO Ptr)
-  return $ MkJSObject res
+  pure $ MkJSObject res
 
 ||| Creates a new `Date` object from milliseconds.
 newDateFromMilliseconds : Milliseconds -> JS_IO (JSValue JSDate)
 newDateFromMilliseconds (MkMilliseconds millis) = do
   res <- jscall "new Date(%0)" (Int -> JS_IO Ptr) millis
-  return $ MkJSObject res
+  pure $ MkJSObject res
 
 ||| Creates a new `Date` object from a string.
 newDateFromString : String -> JS_IO (JSValue JSDate)
 newDateFromString str = do
   res <- jscall "new Date(%0)" (String -> JS_IO Ptr) str
-  return $ MkJSObject res
+  pure $ MkJSObject res
 
 ||| Copies a `Date` object.
 copyDate : (JSValue JSDate) -> JS_IO (JSValue JSDate)
 copyDate date = do
   res <- jscall "new Date(%0)" (Ptr -> JS_IO Ptr) (unpack date)
-  return $ MkJSObject res
+  pure $ MkJSObject res
 
 ||| Gets the day of `Date` object.
 getDay : JSValue JSDate -> JS_IO Day
 getDay date = do
   day <- jscall "%0.getDay()" (Ptr -> JS_IO Int) (unpack date)
-  return $ toDay day
+  pure $ toDay day
 where
   toDay : Int -> Day
   toDay 1 = Monday
@@ -58,20 +58,20 @@ where
 getMilliseconds : JSValue JSDate -> JS_IO Milliseconds
 getMilliseconds date = do
   millis <- jscall "%0.getMilliseconds()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkMilliseconds millis
+  pure $ MkMilliseconds millis
 
 ||| Sets the milliseconds from a `Date` object. Modifies the original date.
 setMilliseconds : JSValue JSDate -> Milliseconds -> JS_IO (JSValue JSDate)
 setMilliseconds date millis = do
   jscall "%0.getMilliseconds(%1)" (Ptr -> Int -> JS_IO Int)
              (unpack date) (unMilliseconds millis)
-  return date
+  pure date
 
 ||| Gets the month from a `Date` object.
 getMonth : JSValue JSDate -> JS_IO Month
 getMonth date  = do
   month <- jscall "%0.getMonth()" (Ptr -> JS_IO Int) (unpack date)
-  return $ toMonth month
+  pure $ toMonth month
 where
   toMonth : Int -> Month
   toMonth 0  = January
@@ -92,7 +92,7 @@ setMonth : JSValue JSDate -> Month -> JS_IO (JSValue JSDate)
 setMonth date month = do
   jscall "%0.setMonth(%1)" (Ptr -> Int -> JS_IO Int)
            (unpack date) (fromMonth month)
-  return date
+  pure date
 where
   fromMonth : Month -> Int
   fromMonth January   = 0
@@ -117,69 +117,69 @@ setYear : JSValue JSDate -> Year -> JS_IO (JSValue JSDate)
 setYear date year = do
   jscall "%0.setYear(%1)" (Ptr -> Int -> JS_IO Int)
          (unpack date) (unYear year)
-  return date
+  pure date
 
 ||| Gets the date from a `Date` object.
 getDate : JSValue JSDate -> JS_IO Date
 getDate date = do
   date' <- jscall "%0.getDate()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkDate date'
+  pure $ MkDate date'
 
 ||| Sets the date from a `Date` object. Modifies the original date.
 setDate : JSValue JSDate -> Date -> JS_IO (JSValue JSDate)
 setDate date date' = do
   jscall "%0.setDate(%1)" (Ptr -> Int -> JS_IO Int)
           (unpack date) (unDate date')
-  return date
+  pure date
 
 ||| Gets the hours from a `Date` object.
 getHours : JSValue JSDate -> JS_IO Hours
 getHours date = do
   hours <- jscall "%0.getHours()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkHours hours
+  pure $ MkHours hours
 
 ||| Sets the hours from a `Date` object. Modifies the original date.
 setHours : JSValue JSDate -> Hours -> JS_IO (JSValue JSDate)
 setHours date hours = do
   jscall "%0.setHours(%1)" (Ptr -> Int -> JS_IO Int)
          (unpack date) (unHours hours)
-  return date
+  pure date
 
 ||| Gets the minutes from a `Date` object.
 getMinutes : JSValue JSDate -> JS_IO Minutes
 getMinutes date = do
   minutes <- jscall "%0.getMinutes()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkMinutes minutes
+  pure $ MkMinutes minutes
 
 ||| Sets the minutes from a `Date` object. Modifies the original date.
 setMinutes : JSValue JSDate -> Minutes -> JS_IO (JSValue JSDate)
 setMinutes date mins = do
   jscall "%0.setMinutes(%1)" (Ptr -> Int -> JS_IO Int)
          (unpack date) (unMinutes mins)
-  return date
+  pure date
 
 ||| Gets the seconds from a `Date` object.
 getSeconds : JSValue JSDate -> JS_IO Seconds
 getSeconds date = do
   seconds <- jscall "%0.getSeconds()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkSeconds seconds
+  pure $ MkSeconds seconds
 
 ||| Sets the seconds from a `Date` object. Modifies the original date.
 setSeconds : JSValue JSDate -> Seconds -> JS_IO (JSValue JSDate)
 setSeconds date secs = do
   jscall "%0.setSeconds(%1)" (Ptr -> Int -> JS_IO Int)
          (unpack date) (unSeconds secs)
-  return date
+  pure date
 
 ||| Gets the full year of a `Date` object.
 getFullYear : JSValue JSDate -> JS_IO Year
 getFullYear date = do
   year <- jscall "%0.getFullYear()" (Ptr -> JS_IO Int) (unpack date)
-  return $ MkYear year
+  pure $ MkYear year
 
 ||| Sets the full year of a `Date` object. Modifies the original date.
 setFullYear : JSValue JSDate -> Year -> JS_IO (JSValue JSDate)
 setFullYear date year = do
   jscall "%0.setFullYear(%1)" (Ptr -> Int -> JS_IO Int)
          (unpack date) (unYear year)
-  return date
+  pure date

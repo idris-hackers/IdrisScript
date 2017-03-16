@@ -8,7 +8,7 @@ JSRef = Ptr
 %inline
 jscall : (fname : String) -> (ty : Type) ->
           {auto fty : FTy FFI_JS [] ty} -> ty
-jscall fname ty = foreign FFI_JS fname ty 
+jscall fname ty = foreign FFI_JS fname ty
 
 data JSType = JSNumber
             | JSString
@@ -44,13 +44,13 @@ typeOf : JSRef -> JS_IO JSType
 typeOf JSRef = do
   res <- jscall checkType (Ptr -> JS_IO Int) JSRef
   case res of
-       0 => return JSNumber
-       1 => return JSString
-       2 => return JSBoolean
-       3 => return JSFunction
-       4 => return JSUndefined
-       5 => return (JSObject !ctrName)
-       _ => return JSNull
+       0 => pure JSNumber
+       1 => pure JSString
+       2 => pure JSBoolean
+       3 => pure JSFunction
+       4 => pure JSUndefined
+       5 => pure (JSObject !ctrName)
+       _ => pure JSNull
 where
   ctrName : JS_IO String
   ctrName =
@@ -124,13 +124,13 @@ unpack (MkJSUndefined JSRef) = JSRef
 pack : JSRef -> JS_IO (t ** JSValue t)
 pack JSRef =
   case !(typeOf JSRef) of
-       JSNumber   => return (JSNumber    ** MkJSNumber    JSRef)
-       JSString   => return (JSString    ** MkJSString    JSRef)
-       JSBoolean  => return (JSBoolean   ** MkJSBoolean   JSRef)
-       JSFunction => return (JSFunction  ** MkJSFunction  JSRef)
-       JSNull     => return (JSNull      ** MkJSNull      JSRef)
-       JSObject c => return (JSObject c  ** MkJSObject    JSRef)
-       _          => return (JSUndefined ** MkJSUndefined JSRef)
+       JSNumber   => pure (JSNumber    ** MkJSNumber    JSRef)
+       JSString   => pure (JSString    ** MkJSString    JSRef)
+       JSBoolean  => pure (JSBoolean   ** MkJSBoolean   JSRef)
+       JSFunction => pure (JSFunction  ** MkJSFunction  JSRef)
+       JSNull     => pure (JSNull      ** MkJSNull      JSRef)
+       JSObject c => pure (JSObject c  ** MkJSObject    JSRef)
+       _          => pure (JSUndefined ** MkJSUndefined JSRef)
 
 ||| Log a value to console
 log : JSValue t -> JS_IO ()
@@ -140,13 +140,13 @@ log js = jscall "console.log(%0)" (Ptr -> JS_IO ()) (unpack js)
 isUndefined : JSValue t -> JS_IO Bool
 isUndefined val = do
   ty <- typeOf (unpack val)
-  return $ ty == JSUndefined
+  pure $ ty == JSUndefined
 
 ||| Check if a value is null
 isNull : JSValue t -> JS_IO Bool
 isNull val = do
   ty <- typeOf (unpack val)
-  return $ ty == JSNull
+  pure $ ty == JSNull
 
 ||| Create a new object with a constructor function
 ||| @ con constructor function
@@ -163,7 +163,7 @@ new con args = do
                           return new Con(con, args);
                         })(%0, %1)""" (Ptr -> Ptr -> JS_IO Ptr)
                    (unpack con) (unpack args)
-  return $ (!(ctrName obj) ** MkJSObject obj)
+  pure $ (!(ctrName obj) ** MkJSObject obj)
 where
   ctrName : JSRef -> JS_IO String
   ctrName JSRef =

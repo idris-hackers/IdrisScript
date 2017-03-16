@@ -13,6 +13,6 @@ parse : String -> JS_IO (Maybe (c ** JSValue (JSObject c)))
 parse str = do
   res <- jscall "JSON.parse(%0)" (String -> JS_IO Ptr) str
   case !(pack res) of
-       (JSObject "Object" ** obj) => return $ Just ("Object" ** obj)
-       (JSObject "Array"  ** obj) => return $ Just ("Array" ** obj)
-       _                          => return Nothing
+       (JSObject "Object" ** obj) => pure $ Just ("Object" ** obj)
+       (JSObject "Array"  ** obj) => pure $ Just ("Array" ** obj)
+       _                          => pure Nothing

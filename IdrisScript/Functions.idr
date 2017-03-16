@@ -9,7 +9,7 @@ infixl 6 !!
 Function : JS_IO (JSValue JSFunction)
 Function = do
   fun <- jscall "Function" (JS_IO Ptr)
-  return $ MkJSFunction fun
+  pure $ MkJSFunction fun
 
 ||| Applys an array `args` as arguments to the function `fun`
 apply : (fun : JSValue JSFunction)
@@ -29,7 +29,7 @@ setProperty : (prop : String)
 setProperty prop val fun = do
   jscall "%0[%1] = %2" (Ptr -> String -> Ptr -> JS_IO Ptr)
      (unpack fun) prop (unpack val)
-  return fun
+  pure fun
 
 ||| Gets the property `prop` from a function `fun`.
 getProperty : (prop : String)
@@ -38,8 +38,8 @@ getProperty : (prop : String)
 getProperty prop fun = do
   elm <- jscall "%0[%1]" (Ptr -> String -> JS_IO Ptr) (unpack fun) prop
   case !(typeOf elm) of
-       JSUndefined => return Nothing
-       _           => return $ Just !(pack elm)
+       JSUndefined => pure Nothing
+       _           => pure $ Just !(pack elm)
 
 ||| Gets the property `prop` from a function `fun`.
 (!!) : (fun : JSValue JSFunction)
@@ -54,7 +54,7 @@ hasOwnProperty : (prop : String)
 hasOwnProperty prop fun = do
   res <- jscall "%0.hasOwnProperty(%1)" (Ptr -> String -> JS_IO Int)
                 (unpack fun) prop
-  return $ res == 1
+  pure $ res == 1
 
 ||| Returns the name of a function.
 name : JSValue JSFunction -> JS_IO String
@@ -64,4 +64,4 @@ name fun = jscall "%0.name" (Ptr -> JS_IO String) (unpack fun)
 constr : JSValue JSFunction -> JS_IO (JSValue JSFunction)
 constr fun = do
   con <- jscall "%0.constructor" (Ptr -> JS_IO Ptr) (unpack fun)
-  return $ MkJSFunction con
+  pure $ MkJSFunction con

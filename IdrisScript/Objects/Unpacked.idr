@@ -12,4 +12,4 @@ setProperty : ToJS from to
 setProperty {from} {to} prop val obj = do
   jscall "%0[%1] = %2" (Ptr -> String -> Ptr -> JS_IO Ptr)
          (unpack obj) prop (unpack (toJS {from}{to} val))
-  return obj
+  pure obj

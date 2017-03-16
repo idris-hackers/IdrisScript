@@ -11,5 +11,5 @@ main = do
        Just (_ ** obj) =>
          case !(getProperty "bar" obj) of
               Just (_ ** res) => log res
-              _               => return ()
-       _               => return ()
+              _               => pure ()
+       _               => pure ()

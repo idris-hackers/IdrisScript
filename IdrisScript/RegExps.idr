@@ -7,7 +7,7 @@ import IdrisScript
 RegExp : JS_IO (JSValue JSFunction)
 RegExp = do
   regex <- jscall "RegExp" (JS_IO Ptr)
-  return $ MkJSFunction regex
+  pure $ MkJSFunction regex
 
 data RegExpFlags = Global
                  | IgnoreCase
@@ -27,7 +27,7 @@ newRegExp : String -> List RegExpFlags -> JS_IO (JSValue JSRegExp)
 newRegExp patt flags = do
   regex <- jscall "new RegExp(%0, %1)" (String -> String -> JS_IO Ptr)
                   patt (mkFlags . nub $ flags)
-  return $ MkJSObject regex
+  pure $ MkJSObject regex
 where
   mkFlags : List RegExpFlags -> String
   mkFlags (Global     :: fs) = "g" ++ mkFlags fs
@@ -40,9 +40,9 @@ match : (str : String)
      -> (regex : JSValue JSRegExp)
      -> JS_IO (JSValue JSArray)
 match str regex = do
-  res <- jscall "%0.match(%1)" (String -> Ptr -> JS_IO Ptr) 
+  res <- jscall "%0.match(%1)" (String -> Ptr -> JS_IO Ptr)
                 str (unpack regex)
-  return $ MkJSObject res
+  pure $ MkJSObject res
 
 ||| Replaces matches of `regex` with `rpl` in the string `str`. Modifies
 ||| the original value.
@@ -59,6 +59,6 @@ split : (str : String)
      -> (regex : JSValue JSRegExp)
      -> JS_IO (JSValue JSArray)
 split str regex = do
-  res <- jscall "%0.split(%1)" (String -> Ptr -> JS_IO Ptr) 
+  res <- jscall "%0.split(%1)" (String -> Ptr -> JS_IO Ptr)
                 str (unpack regex)
-  return $ MkJSObject res
+  pure $ MkJSObject res
