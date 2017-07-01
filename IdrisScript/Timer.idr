@@ -17,10 +17,10 @@ record Interval where
 ||| Executes a JS_IO action after `millis` milliseconds.
 setTimeout : (() -> JS_IO ()) -> (millis : Int) -> JS_IO Timeout
 setTimeout f millis = do
-  timeout <- jscall "setTimeout(%0, %1)" 
+  timeout <- jscall "setTimeout(%0, %1)"
                     (JsFn (() -> JS_IO ()) -> Int -> JS_IO Ptr)
                     (MkJsFn f) millis
-  return $ MkTimeout timeout
+  pure $ MkTimeout timeout
 
 ||| Clears a timeout.
 export
@@ -31,10 +31,10 @@ clearTimeout timeout =
 ||| Periodically executes a JS_IO action after `millis` milliseconds.
 setInterval : (() -> JS_IO ()) -> Int -> JS_IO Interval
 setInterval f millis = do
-  interval <- jscall "setInterval(%0, %1)" 
+  interval <- jscall "setInterval(%0, %1)"
                      (JsFn (() -> JS_IO ()) -> Int -> JS_IO Ptr)
                      (MkJsFn f) millis
-  return $ MkInterval interval
+  pure $ MkInterval interval
 
 ||| Clears an interval.
 export
